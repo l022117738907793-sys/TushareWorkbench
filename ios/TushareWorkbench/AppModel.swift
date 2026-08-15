@@ -34,7 +34,7 @@ final class AppModel: ObservableObject {
     @Published var loading = true
     @Published var errorText: String?
     @Published var liveError: String?
-    @Published var remoteUrl = "http://127.0.0.1:8787"
+    @Published var remoteUrl = ""
     @Published var remoteStatus: String?
     @Published var remoteBusy = false
     @Published var dataSource: DataSource = .demo
@@ -57,7 +57,7 @@ final class AppModel: ObservableObject {
             dataSource = .tushare
         }
         token = defaults.string(forKey: "token") ?? ""
-        remoteUrl = defaults.string(forKey: "remoteUrl") ?? "http://127.0.0.1:8787"
+        remoteUrl = defaults.string(forKey: "remoteUrl") ?? ""
         overrides = (defaults.dictionary(forKey: "overrides") as? [String: Double]) ?? [:]
         if let data = defaults.data(forKey: "history"),
            let records = try? JSONDecoder().decode([HistoryRecord].self, from: data) {
