@@ -51,6 +51,10 @@ def main():
         ])
         run(["git", "push", "origin", "HEAD:main"])
         print("已推送到 main，网页将自动重新部署", flush=True)
+        out_path = os.environ.get("GITHUB_OUTPUT", "")
+        if out_path:
+            with open(out_path, "a", encoding="utf-8") as f:
+                f.write("deployed=true\n")
     else:
         print("未检测到 GITHUB_TOKEN/GITHUB_REPOSITORY，跳过推送（本地模式）", flush=True)
 

@@ -20,7 +20,13 @@ jobs:
       - name: Install dependencies
         run: pip install akshare tushare pandas requests
       - name: Update snapshot and push
+        id: update
         env:
           TUSHARE_TOKEN: ${{ secrets.TUSHARE_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python3 -u data/scripts/ci_update.py
+      - name: Trigger web deploy
+        if: steps.update.outputs.deployed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run "Deploy Web to GitHub Pages" --ref main
