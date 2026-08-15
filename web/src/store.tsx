@@ -164,7 +164,11 @@ async function loadCachedRemoteSnapshot(base: string): Promise<Snapshot | null> 
 }
 
 async function loadBundledSnapshot(): Promise<Snapshot> {
-  const latest = await fetch("data/latest.json").then((r) => r.json());
+  const latestRes = await fetch("data/latest.json");
+  if (!latestRes.ok) {
+    throw new Error(`快照清单加载失败（HTTP ${latestRes.status}）`);
+  }
+  const latest = await latestRes.json();
   const base = `data/${latest.snapshot}`;
   const [meta, calendar, indices, sectors, stocks, etfs] =
     await Promise.all(
