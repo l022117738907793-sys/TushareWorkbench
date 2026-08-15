@@ -34,6 +34,21 @@ python3 -u server/server.py \
 
 网页端与 iOS 端都在设置里提供「快照服务地址」；填写后应用启动时会自动下载最新快照，服务不可用时回退到内置快照并提示原因。
 
+## 常见问题
+
+### Xcode 报 “Error opening input file … (Operation timed out)”
+
+如果项目放在 iCloud 同步的目录（例如 `~/Documents`），磁盘空间不足时 macOS 会把文件
+“卸载”成云端占位文件（`ls -lO` 会显示 `dataless`），Xcode 读取时就会超时。处理方法：
+
+```bash
+python3 scripts/materialize.py   # 强制把整个仓库取回本地
+ls -lO ios/TushareWorkbench/TushareWorkbenchApp.swift  # 确认不再显示 dataless
+```
+
+然后完全退出 Xcode 重新打开工程即可。长期建议把项目放到非同步目录
+（例如 `~/Developer/Tushare`），避免再次被 iCloud 卸载。
+
 ## 网页原型
 
 ```bash
