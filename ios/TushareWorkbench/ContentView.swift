@@ -20,7 +20,7 @@ struct ContentView: View {
             } else {
                 TabView(selection: $model.selectedTab) {
                     WorkbenchView()
-                        .tabItem { Label("工作台", systemImage: "funnel") }
+                        .tabItem { Label("工作台", systemImage: "line.3.horizontal.decrease") }
                         .tag(AppTab.workbench)
                     AnalysisView()
                         .tabItem { Label("个股分析", systemImage: "chart.line.uptrend.xyaxis") }
