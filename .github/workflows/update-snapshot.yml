@@ -1,0 +1,26 @@
+name: Update Daily Snapshot
+
+on:
+  schedule:
+    # 每个工作日 18:30（北京时间，UTC+8）执行
+    - cron: "30 10 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install akshare tushare pandas requests
+      - name: Update snapshot and push
+        env:
+          TUSHARE_TOKEN: ${{ secrets.TUSHARE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 -u data/scripts/ci_update.py

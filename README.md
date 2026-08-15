@@ -45,6 +45,19 @@ python3 -u server/server.py \
 
 注意：源码里没有提交任何密钥；Tushare token 只从环境变量读取，公开仓库是安全的。
 
+## 每日自动更新快照（方案 1）
+
+仓库包含定时工作流 `.github/workflows/update-snapshot.yml`：
+
+- 每个工作日 18:30（北京时间）自动抓取最新快照并推送到 `main`；
+- 推送会自动触发网页版重新部署，朋友刷新就是最新数据；
+- 节假日/周末没有新交易日数据时不会产生提交；
+- 可以随时在 `Actions → Update Daily Snapshot → Run workflow` 手动触发一次。
+
+首次使用建议配置 Tushare token（可选，不配置也能抓取，只是市值排序会退化为权重排序）：
+仓库 `Settings → Secrets and variables → Actions → New repository secret`，
+名称填 `TUSHARE_TOKEN`，值填你的 token。token 只存在于 GitHub 加密存储中，不会出现在仓库里。
+
 ## 常见问题
 
 ### Xcode 报 “Error opening input file … (Operation timed out)”
