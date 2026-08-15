@@ -1,0 +1,44 @@
+name: TushareWorkbench
+options:
+  bundleIdPrefix: com.example
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+packages:
+  Core:
+    path: TushareWorkbenchCore
+targets:
+  TushareWorkbench:
+    type: application
+    platform: iOS
+    sources:
+      - path: TushareWorkbench
+    resources:
+      - path: TushareWorkbench/Resources/demo-data
+      - path: TushareWorkbench/Resources/rules.json
+    info:
+      path: TushareWorkbench/Info.plist
+      properties:
+        CFBundleDisplayName: 趋势工作台
+        UILaunchScreen: {}
+        UIUserInterfaceStyle: Dark
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: true
+        NSLocalNetworkUsageDescription: 用于连接本地快照服务
+    dependencies:
+      - package: Core
+        product: TushareWorkbenchCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.TushareWorkbench
+        TARGETED_DEVICE_FAMILY: 1
+        SWIFT_VERSION: "5.9"
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGNING_ALLOWED: NO
+schemes:
+  TushareWorkbench:
+    build:
+      targets:
+        TushareWorkbench: all
+    run:
+      config: Debug

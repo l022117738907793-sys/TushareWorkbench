@@ -1,0 +1,19 @@
+.DS_Store
+__pycache__/
+*.pyc
+
+# 数据缓存与生成的快照副本
+data/cache/
+web/public/data/
+web/dist/
+web/node_modules/
+web/tsconfig.tsbuildinfo
+web/playwright-report/
+web/test-results/
+
+# Xcode / SwiftPM 构建产物
+ios/build/
+ios/TushareWorkbench.xcodeproj/
+ios/TushareWorkbench.xcworkspace/
+.build/
+DerivedData/
