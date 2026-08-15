@@ -28,13 +28,16 @@ targets:
     dependencies:
       - package: Core
         product: TushareWorkbenchCore
+    postBuildScripts:
+      - name: Strip provenance xattrs before signing
+        script: |
+          find "${TARGET_BUILD_DIR}/${PRODUCT_NAME}.app" -type f -exec xattr -c {} \; 2>/dev/null || true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.example.TushareWorkbench
         TARGETED_DEVICE_FAMILY: 1
         SWIFT_VERSION: "5.9"
         CODE_SIGN_STYLE: Automatic
-        CODE_SIGNING_ALLOWED: NO
 schemes:
   TushareWorkbench:
     build:

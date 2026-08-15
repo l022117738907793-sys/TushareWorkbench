@@ -55,6 +55,13 @@ node e2e/walkthrough.mjs                  # 四页走查 + 截图（BASE_URL 可
 
 需要 Xcode 16+（本仓库用 Xcode 26.6 / iOS 26.5 模拟器验证）。
 
+> 注意：若在桌面代理/自动化环境里用命令行构建，系统会给构建产物自动添加
+> `com.apple.provenance` 属性，`codesign` 可能报
+> “resource fork, Finder information, or similar detritus not allowed”。
+> 这种情况请直接用 Xcode 图形界面打开工程运行（Xcode 进程生成的文件不受影响），
+> 或把仓库 clone 到新目录后再构建。不要在项目里设置
+> `CODE_SIGNING_ALLOWED: NO`，否则真机将无法签名安装。
+
 ```bash
 brew install xcodegen
 python3 data/scripts/sync_ios_assets.py   # 同步快照与 fixture 到工程
