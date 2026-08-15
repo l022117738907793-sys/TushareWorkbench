@@ -34,6 +34,17 @@ python3 -u server/server.py \
 
 网页端与 iOS 端都在设置里提供「快照服务地址」；填写后应用启动时会自动下载最新快照，服务不可用时回退到内置快照并提示原因。
 
+## 发布到 GitHub Pages（让别人直接打开用）
+
+仓库已包含 GitHub Actions 工作流（`.github/workflows/deploy-web.yml`）：
+
+1. 在 GitHub 新建一个公开仓库，把本仓库推上去；
+2. 仓库 `Settings → Pages → Source` 选择 **GitHub Actions**；
+3. 之后每次 push 到 `main`，网页版会自动构建并部署，链接形如
+   `https://<用户名>.github.io/<仓库名>/`，分享给朋友即可。
+
+注意：源码里没有提交任何密钥；Tushare token 只从环境变量读取，公开仓库是安全的。
+
 ## 常见问题
 
 ### Xcode 报 “Error opening input file … (Operation timed out)”
