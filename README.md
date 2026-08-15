@@ -55,6 +55,10 @@ node e2e/walkthrough.mjs                  # 四页走查 + 截图（BASE_URL 可
 
 需要 Xcode 16+（本仓库用 Xcode 26.6 / iOS 26.5 模拟器验证）。
 
+如果你的 Xcode 是 beta 版（应用名 `Xcode-beta.app`），请用
+`open -a Xcode-beta TushareWorkbench.xcodeproj` 打开工程；如需在命令行使用
+`xcodebuild`，先执行 `sudo xcode-select -s /Applications/Xcode-beta.app/Contents/Developer`。
+
 > 注意：若在桌面代理/自动化环境里用命令行构建，系统会给构建产物自动添加
 > `com.apple.provenance` 属性，`codesign` 可能报
 > “resource fork, Finder information, or similar detritus not allowed”。
