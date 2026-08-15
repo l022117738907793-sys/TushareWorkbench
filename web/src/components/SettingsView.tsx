@@ -105,7 +105,7 @@ export function SettingsView() {
             </button>
             {liveError && <p className="warn">{liveError}</p>}
             <p className="muted small">
-              实时模式只刷新三大指数；板块与个股仍用演示快照。接口失败时明确显示数据不足，不编造。
+              实时模式只刷新沪深300（该账号接口限频 1 次/分钟）；板块与个股仍用演示快照。接口失败时明确显示原因，不编造。
             </p>
           </>
         )}

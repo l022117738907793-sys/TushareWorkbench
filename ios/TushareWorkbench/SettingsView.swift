@@ -102,7 +102,7 @@ struct SettingsView: View {
                     Text(liveError).font(.system(size: 12))
                         .foregroundStyle(.orange)
                 }
-                Text("实时模式只刷新三大指数；板块与个股仍用演示快照。接口失败时明确显示数据不足，不编造。")
+                Text("实时模式只刷新沪深300（该账号接口限频 1 次/分钟）；板块与个股仍用演示快照。接口失败时明确显示原因，不编造。")
                     .font(.system(size: 11))
                     .foregroundStyle(Palette.muted)
             }

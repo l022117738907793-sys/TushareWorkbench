@@ -291,52 +291,34 @@ final class AppModel: ObservableObject {
         }
         let client = TushareClient(token: token)
         do {
-            let responses = try await withThrowingTaskGroup(of: TushareResponseData.self) { group in
-                for code in ["000300.SH", "000001.SH", "399006.SZ"] {
-                    group.addTask {
-                        try await client.call(
-                            apiName: "index_daily",
-                            params: [
-                                "ts_code": code,
-                                "start_date": "20260801",
-                                "end_date": "20260815",
-                            ]
-                        )
-                    }
-                }
-                var out: [TushareResponseData] = []
-                for try await r in group { out.append(r) }
-                return out
-            }
+            // 该账号 index_daily 限频 1 次/分钟，只请求主指数，避免连续调用被限频
+            let resp = try await client.call(
+                apiName: "index_daily",
+                params: [
+                    "ts_code": "000300.SH",
+                    "start_date": "20260801",
+                    "end_date": "20260815",
+                ]
+            )
             guard let snapshot else { return }
-            let latest = responses.compactMap { resp -> [String: Any]? in
-                let sorted = resp.items.sorted { a, b in
-                    (a[1].stringValue ?? "") < (b[1].stringValue ?? "")
-                }
-                guard let row = sorted.last else { return nil }
-                var dict: [String: Any] = [:]
-                for (i, field) in resp.fields.enumerated() {
-                    dict[field] = row[i]
-                }
-                return dict
+            let sorted = resp.items.sorted { a, b in
+                (a[1].stringValue ?? "") < (b[1].stringValue ?? "")
             }
-            guard let first = latest.first,
-                  let newDate = (first["trade_date"] as? JSONValue)?.stringValue,
+            guard let row = sorted.last,
+                  let newDate = row[1].stringValue,
                   newDate > (snapshot.meta?.asOf ?? "") else {
                 liveError = "实时数据日期未超过快照日期，继续使用快照"
                 return
             }
+            func value(_ name: String) -> Double? {
+                guard let idx = resp.fields.firstIndex(of: name),
+                      idx < row.count else { return nil }
+                return row[idx].doubleValue
+            }
             let updated = snapshot.indices.map { idx -> SeriesData in
-                guard let row = latest.first(where: {
-                    ($0["ts_code"] as? JSONValue)?.stringValue == idx.code
-                }) else { return idx }
-                let close = row["close"] as? JSONValue
-                let high = row["high"] as? JSONValue
-                let low = row["low"] as? JSONValue
-                let volume = row["vol"] as? JSONValue
-                guard let close, let high, let low, let volume,
-                      let c = close.doubleValue, let h = high.doubleValue,
-                      let l = low.doubleValue, let v = volume.doubleValue else {
+                guard idx.code == "000300.SH",
+                      let c = value("close"), let h = value("high"),
+                      let l = value("low"), let v = value("vol") else {
                     return idx
                 }
                 return SeriesData(
@@ -360,7 +342,7 @@ final class AppModel: ObservableObject {
                 etfs: snapshot.etfs
             )
             recompute()
-            liveError = "已合并实时指数数据（板块与个股仍为演示快照）"
+            liveError = "已合并沪深300实时数据（其余指数保持快照）"
         } catch {
             liveError = "实时拉取失败：\(error.localizedDescription)（继续使用演示数据，不编造）"
         }

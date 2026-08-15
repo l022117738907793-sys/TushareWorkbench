@@ -346,39 +346,33 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const id = ++refreshToken.current;
     setLiveError(null);
     try {
-      const rows = await Promise.all(
-        ["000300.SH", "000001.SH", "399006.SZ"].map((code) =>
-          tushareCall("index_daily", token, {
-            ts_code: code,
-            start_date: "20260801",
-            end_date: "20260815",
-          }),
-        ),
-      );
-      if (id !== refreshToken.current || !snapshot) return;
-      const latestRows = rows.map((r) => {
-        const sorted = [...r.items].sort((a, b) =>
-          (a[1] as string).localeCompare(b[1] as string),
-        );
-        return sorted[sorted.length - 1];
+      // 该账号 index_daily 限频 1 次/分钟，只请求主指数，避免连续调用被限频
+      const resp = await tushareCall("index_daily", token, {
+        ts_code: "000300.SH",
+        start_date: "20260801",
+        end_date: "20260815",
       });
-      const dates = latestRows.map((r) => String(r[1]));
-      const newDate = dates[0];
+      if (id !== refreshToken.current || !snapshot) return;
+      const sorted = [...resp.items].sort((a, b) =>
+        String(a[1]).localeCompare(String(b[1])),
+      );
+      const row = sorted[sorted.length - 1];
+      if (!row) {
+        setLiveError("未获取到沪深300实时数据");
+        return;
+      }
+      const newDate = String(row[1]);
       if (newDate <= String((snapshot.meta as any)?.asOf ?? "")) {
         setLiveError("实时数据日期未超过快照日期，继续使用快照");
         return;
       }
-      const fieldIdx = (fields: string[], name: string) => fields.indexOf(name);
+      const fieldIdx = (name: string) => resp.fields.indexOf(name);
       const updatedIndices = snapshot.indices.map((idx) => {
-        const row = latestRows.find(
-          (r) => String(r[0]) === idx.code.replace(".SH", "").replace(".SZ", ""),
-        ) ?? latestRows.find((r) => r[0] === idx.code);
-        if (!row) return idx;
-        const fields = rows[0].fields;
-        const close = row[fieldIdx(fields, "close")] as number;
-        const high = row[fieldIdx(fields, "high")] as number;
-        const low = row[fieldIdx(fields, "low")] as number;
-        const volume = row[fieldIdx(fields, "vol")] as number;
+        if (idx.code !== "000300.SH") return idx;
+        const close = Number(row[fieldIdx("close")]);
+        const high = Number(row[fieldIdx("high")]);
+        const low = Number(row[fieldIdx("low")]);
+        const volume = Number(row[fieldIdx("vol")]);
         return {
           ...idx,
           close: [...idx.close, close],
@@ -393,11 +387,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
               ...prev,
               meta: { ...prev.meta, asOf: newDate, liveMerged: true },
               calendar: [...(prev.calendar ?? []), newDate],
-              indices: updatedIndices,
-            }
+          indices: updatedIndices,
+        }
           : prev,
       );
-      setLiveError("已合并实时指数数据（板块与个股仍为演示快照）");
+      setLiveError("已合并沪深300实时数据（其余指数保持快照）");
     } catch (e: any) {
       setLiveError(`实时拉取失败：${e.message || e}（继续使用演示数据，不编造）`);
     }
