@@ -121,7 +121,7 @@ export function SettingsView() {
             <input
               className="input"
               value={remoteUrl}
-              placeholder="http://127.0.0.1:8787"
+              placeholder="https://l022117738907793-sys.github.io/TushareWorkbench/data"
               onChange={(e) => setRemoteUrl(e.target.value)}
             />
           }

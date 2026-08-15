@@ -34,7 +34,7 @@ final class AppModel: ObservableObject {
     @Published var loading = true
     @Published var errorText: String?
     @Published var liveError: String?
-    @Published var remoteUrl = ""
+    @Published var remoteUrl = "https://l022117738907793-sys.github.io/TushareWorkbench/data"
     @Published var remoteStatus: String?
     @Published var remoteBusy = false
     @Published var dataSource: DataSource = .demo
@@ -57,7 +57,8 @@ final class AppModel: ObservableObject {
             dataSource = .tushare
         }
         token = defaults.string(forKey: "token") ?? ""
-        remoteUrl = defaults.string(forKey: "remoteUrl") ?? ""
+        remoteUrl = defaults.string(forKey: "remoteUrl")
+            ?? "https://l022117738907793-sys.github.io/TushareWorkbench/data"
         overrides = (defaults.dictionary(forKey: "overrides") as? [String: Double]) ?? [:]
         if let data = defaults.data(forKey: "history"),
            let records = try? JSONDecoder().decode([HistoryRecord].self, from: data) {
@@ -112,7 +113,7 @@ final class AppModel: ObservableObject {
             let snapshot: String
         }
         do {
-            let latestData = try await fetchData(url: URL(string: "\(base)/latest")!)
+            let latestData = try await fetchData(url: URL(string: "\(base)/latest.json")!)
             let latest = try JSONDecoder().decode(Latest.self, from: latestData)
             let dir = FileManager.default.urls(
                 for: .applicationSupportDirectory,
@@ -125,7 +126,7 @@ final class AppModel: ObservableObject {
             for file in ["meta.json", "calendar.json", "indices.json",
                          "sectors.json", "stocks.json", "etfs.json"] {
                 let data = try await fetchData(
-                    url: URL(string: "\(base)/snapshots/\(latest.snapshot)/\(file)")!
+                    url: URL(string: "\(base)/\(latest.snapshot)/\(file)")!
                 )
                 try data.write(to: dir.appendingPathComponent(file))
             }

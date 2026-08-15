@@ -114,7 +114,7 @@ struct SettingsView: View {
             Text("填写快照服务地址后，应用启动时会自动下载最新快照；服务不可用时回退到内置快照。")
                 .font(.system(size: 12))
                 .foregroundStyle(Palette.muted)
-            TextField("http://127.0.0.1:8787", text: Binding(
+            TextField("https://l022117738907793-sys.github.io/TushareWorkbench/data", text: Binding(
                 get: { model.remoteUrl },
                 set: { model.setRemoteUrl($0) }
             ))

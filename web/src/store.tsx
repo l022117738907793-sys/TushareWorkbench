@@ -105,7 +105,7 @@ function snapshotFiles(): string[] {
 }
 
 async function loadRemoteSnapshot(base: string): Promise<Snapshot> {
-  const latest = await fetch(`${base}/latest`).then((r) => {
+  const latest = await fetch(`${base}/latest.json`).then((r) => {
     if (!r.ok) throw new Error(`latest ${r.status}`);
     return r.json();
   });
@@ -114,7 +114,7 @@ async function loadRemoteSnapshot(base: string): Promise<Snapshot> {
   const [meta, calendar, indices, sectors, stocks, etfs] =
     await Promise.all(
       files.map((f) =>
-        fetch(`${base}/snapshots/${name}/${f}`).then((r) => {
+        fetch(`${base}/${name}/${f}`).then((r) => {
           if (!r.ok) throw new Error(`${f} ${r.status}`);
           return r.json();
         }),
@@ -130,11 +130,11 @@ async function cacheRemoteSnapshot(base: string, snapshot: Snapshot) {
     snapshot: String(snapshot.meta?.asOf ?? "unknown"),
     asOf: snapshot.meta?.asOf,
   };
-  await cache.put(`${base}/latest`, new Response(JSON.stringify(latest)));
+  await cache.put(`${base}/latest.json`, new Response(JSON.stringify(latest)));
   const files = snapshotFiles();
   for (const f of files) {
     await cache.put(
-      `${base}/snapshots/${latest.snapshot}/${f}`,
+      `${base}/${latest.snapshot}/${f}`,
       new Response(JSON.stringify((snapshot as any)[f.replace(".json", "")])),
     );
   }
@@ -144,7 +144,7 @@ async function loadCachedRemoteSnapshot(base: string): Promise<Snapshot | null> 
   if (typeof caches === "undefined") return null;
   try {
     const cache = await caches.open("wb-snapshots");
-    const latestRes = await cache.match(`${base}/latest`);
+    const latestRes = await cache.match(`${base}/latest.json`);
     if (!latestRes) return null;
     const latest = await latestRes.json();
     const name = latest.snapshot as string;
@@ -152,7 +152,7 @@ async function loadCachedRemoteSnapshot(base: string): Promise<Snapshot | null> 
     const [meta, calendar, indices, sectors, stocks, etfs] =
       await Promise.all(
         files.map(async (f) => {
-          const r = await cache.match(`${base}/snapshots/${name}/${f}`);
+          const r = await cache.match(`${base}/${name}/${f}`);
           return r ? r.json() : null;
         }),
       );

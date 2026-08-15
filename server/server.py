@@ -105,7 +105,7 @@ class Handler(BaseHTTPRequestHandler):
         if parsed.path == "/health":
             self._send_json({"ok": True, "latest": latest_snapshot_dir()})
             return
-        if parsed.path == "/latest":
+        if parsed.path in ("/latest", "/latest.json"):
             meta = latest_meta()
             if not meta:
                 self._send_json({"error": "no snapshot"}, 404)
